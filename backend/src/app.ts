@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import config from './config';
 import authRoutes from './routes/auth';
 import bookRoutes from './routes/books';
+import memberRoutes from './routes/members';
 import circulationRoutes from './routes/circulation';
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/books', bookRoutes);
+app.use('/api/members', memberRoutes);
 app.use('/api/circulation', circulationRoutes);
 
 // Health check

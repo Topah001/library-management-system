@@ -1,12 +1,15 @@
 import express from 'express';
 import { body, param, validationResult } from 'express-validator';
 import User from '../models/User';
-import { auth, adminAuth } from '../middleware/auth';
+import { protect, authorize } from '../middleware/auth';
+
+// Admin authorization middleware
+const adminAuth = authorize('admin');
 
 const router = express.Router();
 
 // Get all members (admin only)
-router.get('/', auth, adminAuth, async (req, res) => {
+router.get('/', protect, adminAuth, async (req, res) => {
   try {
     const members = await User.find({ role: 'member' }).select('-password');
     res.json(members);
@@ -16,7 +19,7 @@ router.get('/', auth, adminAuth, async (req, res) => {
 });
 
 // Get member by ID
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', protect, async (req, res) => {
   try {
     const member = await User.findById(req.params.id).select('-password');
     if (!member) {
@@ -31,7 +34,7 @@ router.get('/:id', auth, async (req, res) => {
 // Create member (admin only)
 router.post(
   '/',
-  auth,
+  protect,
   adminAuth,
   [
     body('name').trim().notEmpty().withMessage('Name is required'),
@@ -81,7 +84,7 @@ router.post(
 );
 
 // Update member
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', protect, async (req, res) => {
   try {
     const { name, phone, email } = req.body;
     const member = await User.findById(req.params.id);
@@ -117,7 +120,7 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 // Delete member (admin only)
-router.delete('/:id', auth, adminAuth, async (req, res) => {
+router.delete('/:id', protect, adminAuth, async (req, res) => {
   try {
     const member = await User.findById(req.params.id);
 
